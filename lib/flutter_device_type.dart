@@ -3,6 +3,7 @@ library flutter_device_type;
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:math' as Math;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Device {
   static double devicePixelRatio = ui.window.devicePixelRatio;
@@ -12,13 +13,14 @@ class Device {
   static double screenWidth = width / devicePixelRatio;
   static double screenHeight = height / devicePixelRatio;
   static ui.Size screenSize = new ui.Size(screenWidth, screenHeight);
-  final bool isTablet, isPhone, isIos, isAndroid, isIphoneX, hasNotch;
+  final bool isTablet, isPhone, isWeb, isIos, isAndroid, isIphoneX, hasNotch;
   static Device? _device;
   static Function? onMetricsChange;
 
   Device(
       {required this.isTablet,
       required this.isPhone,
+      required this.isWeb,
       required this.isIos,
       required this.isAndroid,
       required this.isIphoneX,
@@ -45,8 +47,9 @@ class Device {
 
     bool isTablet;
     bool isPhone;
-    bool isIos = Platform.isIOS;
-    bool isAndroid = Platform.isAndroid;
+    bool isWeb = kIsWeb;
+    bool isIos = !kIsWeb && Platform.isIOS;
+    bool isAndroid = !kIsWeb && Platform.isAndroid;
     bool isIphoneX = false;
     bool hasNotch = false;
 
@@ -99,6 +102,7 @@ class Device {
     return _device = new Device(
         isTablet: isTablet,
         isPhone: isPhone,
+        isWeb: isWeb,
         isAndroid: isAndroid,
         isIos: isIos,
         isIphoneX: isIphoneX,
@@ -119,9 +123,9 @@ class Device {
         (ui.window.viewPadding.top + ui.window.viewPadding.bottom));
   }
 
-  static int get _ppi => Platform.isAndroid
+  static int get _ppi => !kIsWeb && Platform.isAndroid
       ? 160
-      : Platform.isIOS
+      : !kIsWeb && Platform.isIOS
           ? 150
           : 96;
 
